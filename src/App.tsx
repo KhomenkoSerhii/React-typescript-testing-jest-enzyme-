@@ -1,26 +1,60 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Container } from "@material-ui/core";
+import { ThemeProvider } from "@material-ui/core/styles";
+import React, { useEffect, useState } from "react";
+import TodoListComponent from "./components/TodoList/TodoListComponent";
+import TodoComponent from "./components/TodoMainComponent/TodoMainComponent";
+import { ITodo } from "./interfaces/interfaces";
+import { theme } from "./setup/theme";
 
-function App() {
+const App: React.FC = () => {
+  const [todoList, setTodoList] = useState<ITodo[]>([]);
+
+  useEffect(() => {
+    const saved = JSON.parse(
+      localStorage.getItem("todoList") || "[]"
+    ) as ITodo[];
+    setTodoList(saved);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("todoList", JSON.stringify(todoList));
+  }, [todoList]);
+
+  const addHandler = (todo: string) => {
+    const newTodo: ITodo = {
+      title: todo,
+      id: Date.now(),
+      completed: false,
+    };
+    setTodoList((prev) => [newTodo, ...prev]);
+  };
+
+  const toggleHandler = (id: number) => {
+    setTodoList((prev) =>
+      prev.map((todo) => {
+        if (todo.id === id) {
+          todo.completed = !todo.completed;
+        }
+        return todo;
+      })
+    );
+  };
+  const removeHandler = (id: number) => {
+    setTodoList((prev) => prev.filter((todo) => todo.id !== id));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <Container maxWidth="md">
+        <TodoComponent onAdd={addHandler} />
+        <TodoListComponent
+          todoList={todoList}
+          onToggle={toggleHandler}
+          onRemove={removeHandler}
+        />
+      </Container>
+    </ThemeProvider>
   );
-}
+};
 
 export default App;
