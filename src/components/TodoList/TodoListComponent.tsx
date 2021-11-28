@@ -24,7 +24,7 @@ const TodoList: React.FC<TodoListProps> = ({
   onToggle,
   onRemove,
 }) => {
-  if (todoList.length === 0) {
+  if (todoList?.length === 0) {
     return (
       <Typography align="center" variant="h4">
         No Tasks
@@ -35,16 +35,18 @@ const TodoList: React.FC<TodoListProps> = ({
   return (
     <Box p={4}>
       <List>
-        {todoList.map((todo) => {
+        {todoList?.map((todo) => {
           const classes = [];
           if (todo.completed) {
             classes.push(true);
           }
           return (
             <ListItem
+              className="List"
               key={todo.id}
               secondaryAction={
                 <IconButton
+                  className="removeIcon"
                   edge="end"
                   aria-label="comments"
                   onClick={() => onRemove(todo.id)}
@@ -54,12 +56,17 @@ const TodoList: React.FC<TodoListProps> = ({
               }
               disablePadding
             >
-              <ListItemButton onClick={() => onToggle(todo.id)}>
+              <ListItemButton className="Checkbox" onClick={() => onToggle(todo.id)}>
                 <ListItemIcon>
-                  <Checkbox edge="start" checked={todo.completed} />
+                  <Checkbox
+                    edge="start"
+                    checked={todo.completed}
+                  />
+    
                 </ListItemIcon>
                 <ListItemText
                   primary={todo.title}
+                  className={classes.length ? "line-through" : ''}
                   style={{
                     textDecoration: classes.length ? "line-through" : "",
                   }}
